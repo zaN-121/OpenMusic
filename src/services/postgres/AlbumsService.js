@@ -1,6 +1,8 @@
-/* eslint-disable no-underscore-dangle */
+// Dependencies
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+
+// Errors
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
 
