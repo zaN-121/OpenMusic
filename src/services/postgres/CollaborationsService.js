@@ -17,9 +17,9 @@ class CollaborationsService {
       values: [playlistId, userId],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (result.rows[0]) {
+    if (rows[0]) {
       throw new InvariantError('Collaboration sudah ada');
     }
   }
@@ -31,13 +31,13 @@ class CollaborationsService {
       values: [id, playlistId, userId],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new InvariantError('Collaborations gagal ditambahkan');
     }
 
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async deleteCollaboration(playlistId, userId) {
@@ -45,9 +45,9 @@ class CollaborationsService {
       text: 'DELETE FROM collaborations WHERE playlist_id = $1 AND user_id = $2 RETURNING id',
       values: [playlistId, userId],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('Collaborations tidak ditemukan');
     }
   }

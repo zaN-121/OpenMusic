@@ -19,9 +19,9 @@ class UsersService {
       values: [username],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (result.rows[0]) {
+    if (rows[0]) {
       throw new InvariantError('Gagal menambahkan user, Username telah digunakan');
     }
   }
@@ -32,9 +32,9 @@ class UsersService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('User tidak ditemukan');
     }
   }
@@ -44,19 +44,19 @@ class UsersService {
       text: 'SELECT id, password FROM users WHERE username = $1',
       values: [username],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new AuthenticationError('Kredensial yang anda masukkan salah');
     }
 
-    const { password: hashedPassword } = result.rows[0];
+    const { password: hashedPassword } = rows[0];
     const match = await bcrypt.compare(password, hashedPassword);
 
     if (!match) {
       throw new AuthenticationError('Kredensial yang anda masukkan salah');
     }
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async addUser(username, password, fullname) {
@@ -66,18 +66,18 @@ class UsersService {
       text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
       values: [id, username, hashedPassword, fullname],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new InvariantError('Users gagal ditambahkan');
     }
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async getUsers() {
-    const result = await this._pool.query('SELECT id, username, fullname FROM users');
+    const { rows } = await this._pool.query('SELECT id, username, fullname FROM users');
 
-    return result.rows;
+    return rows;
   }
 
   async getUserById(id) {
@@ -86,12 +86,12 @@ class UsersService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('User tidak ditemukan');
     }
-    return result.rows[0];
+    return rows[0];
   }
 
   async getUsersByUsername(username) {
@@ -99,8 +99,8 @@ class UsersService {
       text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
       values: [`%${username}%`],
     };
-    const result = await this._pool.query(query);
-    return result.rows;
+    const { rows } = await this._pool.query(query);
+    return rows;
   }
 }
 

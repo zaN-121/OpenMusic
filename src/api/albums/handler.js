@@ -2,9 +2,10 @@
 const autoBind = require('auto-bind');
 
 class AlbumsHandler {
-  constructor(albumsService, songsService, validator) {
+  constructor(albumsService, songsService, userAlbumLikesService, validator) {
     this._albumsService = albumsService;
     this._songsService = songsService;
+    this._userAlbumLikesService = userAlbumLikesService;
     this._validator = validator;
 
     autoBind(this);
@@ -64,10 +65,56 @@ class AlbumsHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'Catatan berhasil dihapus',
+      message: 'Album berhasil dihapus',
     });
     response.code(200);
     return response;
+  }
+
+  async postAlbumLikeHandler(request, h) {
+    const { id: credentialId } = request.auth.credentials;
+    const { albumId } = request.params;
+
+    await this._albumsService.verifyIsAlbumExist(albumId);
+    const didLiked = await this._albumsService.verifyDidUserLikedAlbum(albumId, credentialId);
+
+    let message = '';
+
+    if (!didLiked) {
+      await this._userAlbumLikesService.addLike(albumId, credentialId);
+      message = 'Berhasil menyukai album';
+    } else {
+      await this._userAlbumLikesService.unlike(albumId, credentialId);
+      message = 'Batal menyukai album';
+    }
+
+    return h.response({
+      status: 'success',
+      message,
+    }).code(201);
+  }
+
+  async getAlbumLikesHandler(request, h) {
+    const { albumId } = request.params;
+
+    await this._albumsService.verifyIsAlbumExist(albumId);
+    const likeCount = await this._userAlbumLikesService.getAlbumLikes(albumId);
+
+    if (typeof (likeCount) === 'number') {
+      return {
+        status: 'success',
+        data: {
+          likes: likeCount,
+        },
+      };
+    }
+
+    return h.response({
+      status: 'success',
+      data: {
+        likes: Number(likeCount),
+      },
+    }).header('X-Data-Source', 'cache');
   }
 }
 

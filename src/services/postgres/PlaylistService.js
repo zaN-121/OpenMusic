@@ -17,8 +17,8 @@ class PlaylistService {
       text: 'SELECT * FROM playlists WHERE id = $1',
       values: [id],
     };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    const { rows } = await this._pool.query(query);
+    if (!rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
   }
@@ -28,8 +28,8 @@ class PlaylistService {
       text: 'SELECT * FROM playlists WHERE id = $1 AND owner = $2',
       values: [id, owner],
     };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    const { rows } = await this._pool.query(query);
+    if (!rows.length) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
@@ -43,9 +43,9 @@ class PlaylistService {
       values: [userId, playlistId],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
@@ -57,13 +57,13 @@ class PlaylistService {
       values: [id, name, owner],
     };
 
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new InvariantError('Playlist Gagal ditambahkan');
     }
 
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async getPlaylists(owner) {
@@ -75,8 +75,8 @@ class PlaylistService {
       WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
       values: [owner],
     };
-    const result = await this._pool.query(query);
-    return result.rows;
+    const { rows } = await this._pool.query(query);
+    return rows;
   }
 
   async getPlaylistById(playlistId) {
@@ -87,11 +87,26 @@ class PlaylistService {
       WHERE playlists.id = $1`,
       values: [playlistId],
     };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    const { rows } = await this._pool.query(query);
+    if (!rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
-    return result.rows[0];
+    return rows[0];
+  }
+
+  async getPlaylistByIdForExport(playlistId) {
+    const query = {
+      text: `SELECT playlists.id, playlists.name
+      FROM playlists WHERE id = $1`,
+      values: [playlistId],
+    };
+    const { rows } = await this._pool.query(query);
+
+    if (!rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    return rows[0];
   }
 
   async getPlaylistActivitiesById(id) {
@@ -131,9 +146,9 @@ class PlaylistService {
       text: 'UPDATE playlist SET name = $1, username = $2 WHERE id = $3 RETURNING id',
       values: [name, owner, id],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('Gagal memperbarui playlist, Id tidak ditemukan');
     }
   }
@@ -143,9 +158,9 @@ class PlaylistService {
       text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
       values: [id],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('Gagal menghapus playlist, Id tidak ditemukan');
     }
   }

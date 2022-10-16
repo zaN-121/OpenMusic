@@ -17,18 +17,17 @@ class PlaylistSongActivitiesService {
     action,
   ) {
     const id = `pl-sg-act-${nanoid(16)}`;
-    const time = new Date().toISOString();
 
     const query = {
       text: `INSERT INTO playlist_song_activities
-      VALUES($1, $2, $3, $4, $5, $6) RETURNING id`,
-      values: [id, playlist_id, song_id, user_id, action, time],
+      VALUES($1, $2, $3, $4, $5) RETURNING id`,
+      values: [id, playlist_id, song_id, user_id, action],
     };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    const { rows } = await this._pool.query(query);
+    if (!rows.length) {
       throw new InvariantError('Aktivitas gagal ditambahkan');
     }
-    return result.rows[0];
+    return rows[0];
   }
 }
 

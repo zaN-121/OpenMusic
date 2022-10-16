@@ -31,14 +31,12 @@ class CollaborationsHandler {
 
     const result = await this._collaborationsService.addCollaboration(playlistId, userId);
 
-    const response = h.response({
+    return h.response({
       status: 'success',
       data: {
         collaborationId: result,
       },
-    });
-    response.code(201);
-    return response;
+    }).code(201);
   }
 
   async deleteCollaborationByIdHandler(request) {

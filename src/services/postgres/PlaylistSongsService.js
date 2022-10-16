@@ -16,8 +16,8 @@ class PlaylistSongsService {
       text: 'SELECT * FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2',
       values: [playlistId, songId],
     };
-    const result = await this._pool.query(query);
-    if (result.rows[0]) {
+    const { rows } = await this._pool.query(query);
+    if (rows[0]) {
       throw new InvariantError('Lagu sudah ada di playlist');
     }
   }
@@ -29,13 +29,13 @@ class PlaylistSongsService {
       text: 'INSERT INTO playlist_songs VALUES ($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new InvariantError('Gagal membuat playlist songs');
     }
 
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async getPlaylistSongsByPlaylistId(playlistId) {
@@ -43,9 +43,9 @@ class PlaylistSongsService {
       text: 'SELECT * FROM playlist_songs WHERE playlist_id = $1',
       values: [playlistId],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    return result.rows;
+    return rows;
   }
 
   async deletePlaylistSong(playlistId, songId) {
@@ -53,9 +53,9 @@ class PlaylistSongsService {
       text: 'DELETE FROM playlist_songs WHERE song_id = $1 AND playlist_id = $2 RETURNING id',
       values: [songId, playlistId],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!rows.length) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
   }

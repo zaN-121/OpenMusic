@@ -84,12 +84,10 @@ class PlaylistsHandler {
       action,
     );
 
-    const response = h.response({
+    return h.response({
       status: 'success',
       message: `Lagu berhasil ditambahkan ke playlist ${playlistId}`,
-    });
-    response.code(201);
-    return response;
+    }).code(201);
   }
 
   async getPlaylistWithSongsByIdHandler(request) {
@@ -101,6 +99,7 @@ class PlaylistsHandler {
     const playlist = await this._playlistsService.getPlaylistById(playlistId);
     const songs = await this._songsService.getSongsInPlaylistByPlaylistId(playlistId);
     playlist.songs = songs;
+
     return {
       status: 'success',
       data: {

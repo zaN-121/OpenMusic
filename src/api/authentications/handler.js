@@ -27,15 +27,13 @@ class AuthenticationsHandler {
     const refreshToken = this._tokenManager.generateRefreshToken({ id });
     await this._authenticationsService.addRefreshToken(refreshToken);
 
-    const response = h.response({
+    return h.response({
       status: 'success',
       data: {
         accessToken,
         refreshToken,
       },
-    });
-    response.code(201);
-    return response;
+    }).code(201);
   }
 
   async putAuthenticationHandler(request) {

@@ -16,43 +16,37 @@ class UsersHandler {
     await this._usersService.verifyNewUsername(username);
     const result = await this._usersService.addUser(username, password, fullname);
 
-    const response = h.response({
+    return h.response({
       status: 'success',
       message: 'User berhasil ditambahkan',
       data: {
         userId: result,
       },
-    });
-    response.code(201);
-    return response;
+    }).code(201);
   }
 
-  async getUsersHandler(request, h) {
+  async getUsersHandler() {
     const result = await this._usersService.getUsers();
 
-    const response = h.response({
+    return {
       status: 'success',
       data: {
         users: result,
       },
-    });
-    response.code(200);
-    return response;
+    };
   }
 
-  async getUserByIdHandler(request, h) {
+  async getUserByIdHandler(request) {
     const { id } = request.params;
 
     const result = await this._usersService.getUserById(id);
 
-    const response = h.response({
+    return {
       status: 'success',
       data: {
         user: result,
       },
-    });
-    response.code(200);
-    return response;
+    };
   }
 }
 
