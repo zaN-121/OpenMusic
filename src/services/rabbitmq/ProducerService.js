@@ -1,8 +1,9 @@
 const amqplib = require('amqplib');
+const { rabbitMq } = require('../../utils/config');
 
 const ProducerService = {
   sendMessage: async (queue, message) => {
-    const connection = await amqplib.connect(process.env.RABBITMQ_SERVER);
+    const connection = await amqplib.connect(rabbitMq.server);
 
     const channel = await connection.createChannel();
 

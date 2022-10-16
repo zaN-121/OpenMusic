@@ -6,6 +6,9 @@ const Jwt = require('@hapi/jwt');
 const path = require('path');
 const Inert = require('@hapi/inert');
 
+// server config
+const { app } = require('./utils/config');
+
 // plugins
 const usersApi = require('./api/users');
 const authenticationsApi = require('./api/authentications');
@@ -61,8 +64,8 @@ const init = async () => {
   const userAlbumLikesService = new UserAlbumLikesService(cacheService);
 
   const server = Hapi.server({
-    host: process.env.HOST,
-    port: process.env.PORT,
+    host: app.host,
+    port: app.port,
     routes: {
       cors: {
         origin: ['*'],
